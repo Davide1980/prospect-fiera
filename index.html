@@ -4,412 +4,589 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prospect Fiera</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .prospects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .prospect-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .prospect-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .prospect-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .prospect-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .prospect-company {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .priority-alta {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .priority-media {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .priority-bassa {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .prospect-info {
+            margin-bottom: 15px;
+        }
+        
+        .prospect-info div {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+        
+        .prospect-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .prospect-date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .counter {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .buttons {
+                justify-content: center;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .prospects-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">🎯 Prospect Fiera</h1>
+                <div class="counter" id="counter">0 prospect raccolti</div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-success" id="exportBtn" onclick="exportToCSV()" disabled>
+                    📥 Esporta CSV
+                </button>
+                <button class="btn btn-danger hidden" id="clearBtn" onclick="clearAll()">
+                    🗑️ Cancella Tutto
+                </button>
+                <button class="btn btn-primary" onclick="showForm()">
+                    ➕ Nuovo Prospect
+                </button>
+            </div>
+        </div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { Users, Plus, Search, Download, CheckCircle, Building, Mail, Phone, MapPin, Calendar, Tag, FileText, Trash2 } = lucideReact;
+        <!-- Form -->
+        <div class="form-container hidden" id="formContainer">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Nuovo Prospect</h2>
+                <button class="btn" onclick="hideForm()" style="background: #f3f4f6; color: #374151;">Annulla</button>
+            </div>
+            
+            <div class="form-grid">
+                <div>
+                    <div class="form-group">
+                        <label>Nome *</label>
+                        <input type="text" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cognome *</label>
+                        <input type="text" id="cognome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Azienda *</label>
+                        <input type="text" id="azienda" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefono</label>
+                        <input type="tel" id="telefono">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>Ruolo</label>
+                        <input type="text" id="ruolo" placeholder="es. CEO, Marketing Manager...">
+                    </div>
+                    <div class="form-group">
+                        <label>Settore</label>
+                        <input type="text" id="settore" placeholder="es. Tecnologia, Manifatturiero...">
+                    </div>
+                    <div class="form-group">
+                        <label>Interesse/Prodotto</label>
+                        <input type="text" id="interesse" placeholder="A cosa è interessato?">
+                    </div>
+                    <div class="form-group">
+                        <label>Priorità</label>
+                        <select id="priorita">
+                            <option value="bassa">Bassa</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Note</label>
+                        <textarea id="note" rows="3" placeholder="Note aggiuntive..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="saveProspect()" style="width: 100%; margin-top: 20px;">
+                ✅ Salva Prospect
+            </button>
+        </div>
 
-        const ProspectApp = () => {
-            const [prospects, setProspects] = useState([]);
-            const [showForm, setShowForm] = useState(false);
-            const [searchTerm, setSearchTerm] = useState('');
-            const [formData, setFormData] = useState({
-                nome: '',
-                cognome: '',
-                azienda: '',
-                email: '',
-                telefono: '',
-                ruolo: '',
-                settore: '',
-                interesse: '',
-                note: '',
-                priorita: 'media'
-            });
+        <!-- Search -->
+        <div class="search-box" id="searchContainer">
+            <input type="text" id="searchInput" placeholder="🔍 Cerca per nome, cognome, azienda o email..." onkeyup="filterProspects()">
+        </div>
 
-            // Carica i dati dal localStorage all'avvio
-            useEffect(() => {
-                const savedProspects = localStorage.getItem('fieraProspects');
-                if (savedProspects) {
-                    setProspects(JSON.parse(savedProspects));
-                }
-            }, []);
+        <!-- Prospects Grid -->
+        <div id="prospectsContainer">
+            <div class="empty-state" id="emptyState">
+                <h3>👥 Nessun prospect ancora</h3>
+                <p>Inizia a raccogliere i dati dei visitatori del tuo stand</p>
+                <button class="btn btn-primary" onclick="showForm()" style="margin-top: 15px;">
+                    Aggiungi il primo prospect
+                </button>
+            </div>
+            <div class="prospects-grid hidden" id="prospectsGrid"></div>
+        </div>
+    </div>
 
-            // Salva i dati nel localStorage quando cambiano
-            useEffect(() => {
-                localStorage.setItem('fieraProspects', JSON.stringify(prospects));
-            }, [prospects]);
-
-            const handleInputChange = (e) => {
-                const { name, value } = e.target;
-                setFormData(prev => ({
-                    ...prev,
-                    [name]: value
-                }));
+    <script>
+        let prospects = [];
+        
+        // Carica dati da localStorage
+        function loadData() {
+            const saved = localStorage.getItem('fieraProspects');
+            if (saved) {
+                prospects = JSON.parse(saved);
+                updateDisplay();
+            }
+        }
+        
+        // Salva dati in localStorage
+        function saveData() {
+            localStorage.setItem('fieraProspects', JSON.stringify(prospects));
+        }
+        
+        // Mostra form
+        function showForm() {
+            document.getElementById('formContainer').classList.remove('hidden');
+            document.getElementById('searchContainer').classList.add('hidden');
+            document.getElementById('prospectsContainer').classList.add('hidden');
+        }
+        
+        // Nascondi form
+        function hideForm() {
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('searchContainer').classList.remove('hidden');
+            document.getElementById('prospectsContainer').classList.remove('hidden');
+            clearForm();
+        }
+        
+        // Pulisci form
+        function clearForm() {
+            document.getElementById('nome').value = '';
+            document.getElementById('cognome').value = '';
+            document.getElementById('azienda').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('telefono').value = '';
+            document.getElementById('ruolo').value = '';
+            document.getElementById('settore').value = '';
+            document.getElementById('interesse').value = '';
+            document.getElementById('note').value = '';
+            document.getElementById('priorita').value = 'media';
+        }
+        
+        // Salva prospect
+        function saveProspect() {
+            const nome = document.getElementById('nome').value.trim();
+            const cognome = document.getElementById('cognome').value.trim();
+            const azienda = document.getElementById('azienda').value.trim();
+            
+            if (!nome || !cognome || !azienda) {
+                alert('Per favore compila almeno Nome, Cognome e Azienda');
+                return;
+            }
+            
+            const newProspect = {
+                id: Date.now(),
+                nome: nome,
+                cognome: cognome,
+                azienda: azienda,
+                email: document.getElementById('email').value.trim(),
+                telefono: document.getElementById('telefono').value.trim(),
+                ruolo: document.getElementById('ruolo').value.trim(),
+                settore: document.getElementById('settore').value.trim(),
+                interesse: document.getElementById('interesse').value.trim(),
+                note: document.getElementById('note').value.trim(),
+                priorita: document.getElementById('priorita').value,
+                dataInserimento: new Date().toLocaleDateString('it-IT'),
+                oraInserimento: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
             };
-
-            const handleSubmit = () => {
-                if (!formData.nome || !formData.cognome || !formData.azienda) {
-                    alert('Per favore compila almeno Nome, Cognome e Azienda');
-                    return;
-                }
-
-                const newProspect = {
-                    ...formData,
-                    id: Date.now(),
-                    dataInserimento: new Date().toLocaleDateString('it-IT'),
-                    oraInserimento: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
-                };
-
-                setProspects(prev => [...prev, newProspect]);
-                
-                // Reset form
-                setFormData({
-                    nome: '',
-                    cognome: '',
-                    azienda: '',
-                    email: '',
-                    telefono: '',
-                    ruolo: '',
-                    settore: '',
-                    interesse: '',
-                    note: '',
-                    priorita: 'media'
-                });
-                
-                setShowForm(false);
-            };
-
-            const exportToCSV = () => {
-                if (prospects.length === 0) {
-                    alert('Nessun dato da esportare');
-                    return;
-                }
-
-                const headers = ['Nome', 'Cognome', 'Azienda', 'Email', 'Telefono', 'Ruolo', 'Settore', 'Interesse', 'Priorità', 'Note', 'Data', 'Ora'];
-                const csvContent = [
-                    headers.join(','),
-                    ...prospects.map(p => [
-                        p.nome, p.cognome, p.azienda, p.email, p.telefono, p.ruolo, p.settore, p.interesse, p.priorita, p.note, p.dataInserimento, p.oraInserimento
-                    ].map(field => `"${field || ''}"`).join(','))
-                ].join('\n');
-
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', `prospect_fiera_${new Date().toISOString().split('T')[0]}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-
-            const deleteProspect = (id) => {
-                if (confirm('Sei sicuro di voler eliminare questo prospect?')) {
-                    setProspects(prev => prev.filter(p => p.id !== id));
-                }
-            };
-
-            const clearAllProspects = () => {
-                if (confirm('Sei sicuro di voler eliminare TUTTI i prospect? Questa azione non può essere annullata.')) {
-                    setProspects([]);
-                    localStorage.removeItem('fieraProspects');
-                }
-            };
-
-            const getPriorityColor = (priority) => {
-                switch (priority) {
-                    case 'alta': return 'bg-red-100 text-red-800';
-                    case 'media': return 'bg-yellow-100 text-yellow-800';
-                    case 'bassa': return 'bg-green-100 text-green-800';
-                    default: return 'bg-gray-100 text-gray-800';
-                }
-            };
-
-            const filteredProspects = prospects.filter(p => 
+            
+            prospects.push(newProspect);
+            saveData();
+            updateDisplay();
+            hideForm();
+        }
+        
+        // Elimina prospect
+        function deleteProspect(id) {
+            if (confirm('Sei sicuro di voler eliminare questo prospect?')) {
+                prospects = prospects.filter(p => p.id !== id);
+                saveData();
+                updateDisplay();
+            }
+        }
+        
+        // Cancella tutto
+        function clearAll() {
+            if (confirm('Sei sicuro di voler eliminare TUTTI i prospect? Questa azione non può essere annullata.')) {
+                prospects = [];
+                localStorage.removeItem('fieraProspects');
+                updateDisplay();
+            }
+        }
+        
+        // Aggiorna visualizzazione
+        function updateDisplay() {
+            const counter = document.getElementById('counter');
+            const exportBtn = document.getElementById('exportBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const emptyState = document.getElementById('emptyState');
+            const prospectsGrid = document.getElementById('prospectsGrid');
+            
+            counter.textContent = `${prospects.length} prospect raccolti`;
+            
+            if (prospects.length === 0) {
+                exportBtn.disabled = true;
+                clearBtn.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                prospectsGrid.classList.add('hidden');
+            } else {
+                exportBtn.disabled = false;
+                clearBtn.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                prospectsGrid.classList.remove('hidden');
+                renderProspects();
+            }
+        }
+        
+        // Renderizza prospects
+        function renderProspects(searchTerm = '') {
+            const prospectsGrid = document.getElementById('prospectsGrid');
+            const filtered = prospects.filter(p => 
                 p.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 p.cognome.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 p.azienda.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 p.email.toLowerCase().includes(searchTerm.toLowerCase())
             );
-
-            if (showForm) {
-                return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4" },
-                    React.createElement('div', { className: "max-w-2xl mx-auto" },
-                        React.createElement('div', { className: "bg-white rounded-xl shadow-lg p-6" },
-                            React.createElement('div', { className: "flex items-center justify-between mb-6" },
-                                React.createElement('h1', { className: "text-2xl font-bold text-gray-900" }, "Nuovo Prospect"),
-                                React.createElement('button', {
-                                    onClick: () => setShowForm(false),
-                                    className: "px-4 py-2 text-gray-600 hover:text-gray-900 font-medium"
-                                }, "Annulla")
-                            ),
-                            React.createElement('div', { className: "space-y-4" },
-                                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
-                                    React.createElement('div', null,
-                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Nome *"),
-                                        React.createElement('input', {
-                                            type: "text",
-                                            name: "nome",
-                                            value: formData.nome,
-                                            onChange: handleInputChange,
-                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        })
-                                    ),
-                                    React.createElement('div', null,
-                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Cognome *"),
-                                        React.createElement('input', {
-                                            type: "text",
-                                            name: "cognome",
-                                            value: formData.cognome,
-                                            onChange: handleInputChange,
-                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        })
-                                    )
-                                ),
-                                React.createElement('div', null,
-                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Azienda *"),
-                                    React.createElement('input', {
-                                        type: "text",
-                                        name: "azienda",
-                                        value: formData.azienda,
-                                        onChange: handleInputChange,
-                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    })
-                                ),
-                                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
-                                    React.createElement('div', null,
-                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Email"),
-                                        React.createElement('input', {
-                                            type: "email",
-                                            name: "email",
-                                            value: formData.email,
-                                            onChange: handleInputChange,
-                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        })
-                                    ),
-                                    React.createElement('div', null,
-                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Telefono"),
-                                        React.createElement('input', {
-                                            type: "tel",
-                                            name: "telefono",
-                                            value: formData.telefono,
-                                            onChange: handleInputChange,
-                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        })
-                                    )
-                                ),
-                                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
-                                    React.createElement('div', null,
-                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Ruolo"),
-                                        React.createElement('input', {
-                                            type: "text",
-                                            name: "ruolo",
-                                            value: formData.ruolo,
-                                            onChange: handleInputChange,
-                                            placeholder: "es. CEO, Marketing Manager...",
-                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        })
-                                    ),
-                                    React.createElement('div', null,
-                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Settore"),
-                                        React.createElement('input', {
-                                            type: "text",
-                                            name: "settore",
-                                            value: formData.settore,
-                                            onChange: handleInputChange,
-                                            placeholder: "es. Tecnologia, Manifatturiero...",
-                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        })
-                                    )
-                                ),
-                                React.createElement('div', null,
-                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Interesse/Prodotto"),
-                                    React.createElement('input', {
-                                        type: "text",
-                                        name: "interesse",
-                                        value: formData.interesse,
-                                        onChange: handleInputChange,
-                                        placeholder: "A cosa è interessato?",
-                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    })
-                                ),
-                                React.createElement('div', null,
-                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Priorità"),
-                                    React.createElement('select', {
-                                        name: "priorita",
-                                        value: formData.priorita,
-                                        onChange: handleInputChange,
-                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    },
-                                        React.createElement('option', { value: "bassa" }, "Bassa"),
-                                        React.createElement('option', { value: "media" }, "Media"),
-                                        React.createElement('option', { value: "alta" }, "Alta")
-                                    )
-                                ),
-                                React.createElement('div', null,
-                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Note"),
-                                    React.createElement('textarea', {
-                                        name: "note",
-                                        value: formData.note,
-                                        onChange: handleInputChange,
-                                        rows: 3,
-                                        placeholder: "Note aggiuntive...",
-                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    })
-                                ),
-                                React.createElement('button', {
-                                    onClick: handleSubmit,
-                                    className: "w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 font-medium transition duration-200"
-                                },
-                                    React.createElement(CheckCircle, { className: "inline w-5 h-5 mr-2" }),
-                                    "Salva Prospect"
-                                )
-                            )
-                        )
-                    )
-                );
+            
+            if (filtered.length === 0 && searchTerm) {
+                prospectsGrid.innerHTML = '<div class="empty-state"><h3>🔍 Nessun risultato</h3><p>Prova a cercare con termini diversi</p></div>';
+                return;
             }
-
-            return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" },
-                React.createElement('div', { className: "bg-white shadow-sm border-b border-gray-200" },
-                    React.createElement('div', { className: "max-w-7xl mx-auto px-4 py-4" },
-                        React.createElement('div', { className: "flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0" },
-                            React.createElement('div', { className: "flex items-center space-x-3" },
-                                React.createElement(Users, { className: "h-8 w-8 text-blue-600" }),
-                                React.createElement('div', null,
-                                    React.createElement('h1', { className: "text-2xl font-bold text-gray-900" }, "Prospect Fiera"),
-                                    React.createElement('p', { className: "text-sm text-gray-600" }, `${prospects.length} prospect raccolti`)
-                                )
-                            ),
-                            React.createElement('div', { className: "flex flex-col sm:flex-row gap-3" },
-                                React.createElement('button', {
-                                    onClick: exportToCSV,
-                                    disabled: prospects.length === 0,
-                                    className: "flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition duration-200"
-                                },
-                                    React.createElement(Download, { className: "w-4 h-4 mr-2" }),
-                                    "Esporta CSV"
-                                ),
-                                prospects.length > 0 && React.createElement('button', {
-                                    onClick: clearAllProspects,
-                                    className: "flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition duration-200"
-                                },
-                                    React.createElement(Trash2, { className: "w-4 h-4 mr-2" }),
-                                    "Cancella Tutto"
-                                ),
-                                React.createElement('button', {
-                                    onClick: () => setShowForm(true),
-                                    className: "flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition duration-200"
-                                },
-                                    React.createElement(Plus, { className: "w-4 h-4 mr-2" }),
-                                    "Nuovo Prospect"
-                                )
-                            )
-                        )
-                    )
-                ),
-                React.createElement('div', { className: "max-w-7xl mx-auto px-4 py-6" },
-                    React.createElement('div', { className: "relative mb-6" },
-                        React.createElement(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" }),
-                        React.createElement('input', {
-                            type: "text",
-                            placeholder: "Cerca per nome, cognome, azienda o email...",
-                            value: searchTerm,
-                            onChange: (e) => setSearchTerm(e.target.value),
-                            className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        })
-                    ),
-                    filteredProspects.length === 0 ? 
-                        React.createElement('div', { className: "text-center py-12" },
-                            React.createElement(Users, { className: "mx-auto h-12 w-12 text-gray-400 mb-4" }),
-                            React.createElement('h3', { className: "text-lg font-medium text-gray-900 mb-2" },
-                                prospects.length === 0 ? 'Nessun prospect ancora' : 'Nessun risultato'
-                            ),
-                            React.createElement('p', { className: "text-gray-600 mb-6" },
-                                prospects.length === 0 ? 'Inizia a raccogliere i dati dei visitatori del tuo stand' : 'Prova a cercare con termini diversi'
-                            ),
-                            prospects.length === 0 && React.createElement('button', {
-                                onClick: () => setShowForm(true),
-                                className: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition duration-200"
-                            }, "Aggiungi il primo prospect")
-                        ) :
-                        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
-                            filteredProspects.map((prospect) =>
-                                React.createElement('div', { key: prospect.id, className: "bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-200" },
-                                    React.createElement('div', { className: "flex justify-between items-start mb-4" },
-                                        React.createElement('div', null,
-                                            React.createElement('h3', { className: "text-lg font-semibold text-gray-900" },
-                                                `${prospect.nome} ${prospect.cognome}`
-                                            ),
-                                            React.createElement('div', { className: "flex items-center text-gray-600 mt-1" },
-                                                React.createElement(Building, { className: "h-4 w-4 mr-1" }),
-                                                React.createElement('span', { className: "text-sm" }, prospect.azienda)
-                                            )
-                                        ),
-                                        React.createElement('span', { className: `px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(prospect.priorita)}` },
-                                            prospect.priorita.charAt(0).toUpperCase() + prospect.priorita.slice(1)
-                                        )
-                                    ),
-                                    React.createElement('div', { className: "space-y-2" },
-                                        prospect.email && React.createElement('div', { className: "flex items-center text-sm text-gray-600" },
-                                            React.createElement(Mail, { className: "h-4 w-4 mr-2" }),
-                                            React.createElement('span', { className: "truncate" }, prospect.email)
-                                        ),
-                                        prospect.telefono && React.createElement('div', { className: "flex items-center text-sm text-gray-600" },
-                                            React.createElement(Phone, { className: "h-4 w-4 mr-2" }),
-                                            React.createElement('span', null, prospect.telefono)
-                                        ),
-                                        prospect.ruolo && React.createElement('div', { className: "flex items-center text-sm text-gray-600" },
-                                            React.createElement(Tag, { className: "h-4 w-4 mr-2" }),
-                                            React.createElement('span', null, prospect.ruolo)
-                                        ),
-                                        prospect.interesse && React.createElement('div', { className: "flex items-start text-sm text-gray-600" },
-                                            React.createElement(MapPin, { className: "h-4 w-4 mr-2 mt-0.5" }),
-                                            React.createElement('span', { className: "line-clamp-2" }, prospect.interesse)
-                                        ),
-                                        prospect.note && React.createElement('div', { className: "flex items-start text-sm text-gray-600" },
-                                            React.createElement(FileText, { className: "h-4 w-4 mr-2 mt-0.5" }),
-                                            React.createElement('span', { className: "line-clamp-2" }, prospect.note)
-                                        )
-                                    ),
-                                    React.createElement('div', { className: "flex items-center justify-between mt-4 pt-4 border-t border-gray-100" },
-                                        React.createElement('div', { className: "flex items-center text-xs text-gray-500" },
-                                            React.createElement(Calendar, { className: "h-3 w-3 mr-1" }),
-                                            `${prospect.dataInserimento} - ${prospect.oraInserimento}`
-                                        ),
-                                        React.createElement('button', {
-                                            onClick: () => deleteProspect(prospect.id),
-                                            className: "text-red-500 hover:text-red-700 text-xs font-medium flex items-center"
-                                        }, 
-                                            React.createElement(Trash2, { className: "h-3 w-3 mr-1" }),
-                                            "Elimina"
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                )
-            );
-        };
-
-        ReactDOM.render(React.createElement(ProspectApp), document.getElementById('root'));
+            
+            prospectsGrid.innerHTML = filtered.map(prospect => `
+                <div class="prospect-card">
+                    <div class="prospect-header">
+                        <div>
+                            <div class="prospect-name">${prospect.nome} ${prospect.cognome}</div>
+                            <div class="prospect-company">🏢 ${prospect.azienda}</div>
+                        </div>
+                        <div class="priority-badge priority-${prospect.priorita}">
+                            ${prospect.priorita.charAt(0).toUpperCase() + prospect.priorita.slice(1)}
+                        </div>
+                    </div>
+                    
+                    <div class="prospect-info">
+                        ${prospect.email ? `<div>📧 ${prospect.email}</div>` : ''}
+                        ${prospect.telefono ? `<div>📞 ${prospect.telefono}</div>` : ''}
+                        ${prospect.ruolo ? `<div>👔 ${prospect.ruolo}</div>` : ''}
+                        ${prospect.settore ? `<div>🏭 ${prospect.settore}</div>` : ''}
+                        ${prospect.interesse ? `<div>🎯 ${prospect.interesse}</div>` : ''}
+                        ${prospect.note ? `<div>📝 ${prospect.note}</div>` : ''}
+                    </div>
+                    
+                    <div class="prospect-footer">
+                        <div class="prospect-date">
+                            📅 ${prospect.dataInserimento} - ${prospect.oraInserimento}
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteProspect(${prospect.id})" style="padding: 5px 10px; font-size: 12px;">
+                            🗑️ Elimina
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Filtra prospects
+        function filterProspects() {
+            const searchTerm = document.getElementById('searchInput').value;
+            renderProspects(searchTerm);
+        }
+        
+        // Esporta CSV
+        function exportToCSV() {
+            if (prospects.length === 0) {
+                alert('Nessun dato da esportare');
+                return;
+            }
+            
+            const headers = ['Nome', 'Cognome', 'Azienda', 'Email', 'Telefono', 'Ruolo', 'Settore', 'Interesse', 'Priorità', 'Note', 'Data', 'Ora'];
+            const csvContent = [
+                headers.join(','),
+                ...prospects.map(p => [
+                    p.nome, p.cognome, p.azienda, p.email, p.telefono, p.ruolo, p.settore, p.interesse, p.priorita, p.note, p.dataInserimento, p.oraInserimento
+                ].map(field => `"${field || ''}"`).join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `prospect_fiera_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Inizializza app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
     </script>
 </body>
 </html>
