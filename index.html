@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prospect Fiera</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { Users, Plus, Search, Download, CheckCircle, Building, Mail, Phone, MapPin, Calendar, Tag, FileText, Trash2 } = lucideReact;
+
+        const ProspectApp = () => {
+            const [prospects, setProspects] = useState([]);
+            const [showForm, setShowForm] = useState(false);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [formData, setFormData] = useState({
+                nome: '',
+                cognome: '',
+                azienda: '',
+                email: '',
+                telefono: '',
+                ruolo: '',
+                settore: '',
+                interesse: '',
+                note: '',
+                priorita: 'media'
+            });
+
+            // Carica i dati dal localStorage all'avvio
+            useEffect(() => {
+                const savedProspects = localStorage.getItem('fieraProspects');
+                if (savedProspects) {
+                    setProspects(JSON.parse(savedProspects));
+                }
+            }, []);
+
+            // Salva i dati nel localStorage quando cambiano
+            useEffect(() => {
+                localStorage.setItem('fieraProspects', JSON.stringify(prospects));
+            }, [prospects]);
+
+            const handleInputChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            };
+
+            const handleSubmit = () => {
+                if (!formData.nome || !formData.cognome || !formData.azienda) {
+                    alert('Per favore compila almeno Nome, Cognome e Azienda');
+                    return;
+                }
+
+                const newProspect = {
+                    ...formData,
+                    id: Date.now(),
+                    dataInserimento: new Date().toLocaleDateString('it-IT'),
+                    oraInserimento: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                setProspects(prev => [...prev, newProspect]);
+                
+                // Reset form
+                setFormData({
+                    nome: '',
+                    cognome: '',
+                    azienda: '',
+                    email: '',
+                    telefono: '',
+                    ruolo: '',
+                    settore: '',
+                    interesse: '',
+                    note: '',
+                    priorita: 'media'
+                });
+                
+                setShowForm(false);
+            };
+
+            const exportToCSV = () => {
+                if (prospects.length === 0) {
+                    alert('Nessun dato da esportare');
+                    return;
+                }
+
+                const headers = ['Nome', 'Cognome', 'Azienda', 'Email', 'Telefono', 'Ruolo', 'Settore', 'Interesse', 'Priorità', 'Note', 'Data', 'Ora'];
+                const csvContent = [
+                    headers.join(','),
+                    ...prospects.map(p => [
+                        p.nome, p.cognome, p.azienda, p.email, p.telefono, p.ruolo, p.settore, p.interesse, p.priorita, p.note, p.dataInserimento, p.oraInserimento
+                    ].map(field => `"${field || ''}"`).join(','))
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `prospect_fiera_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            const deleteProspect = (id) => {
+                if (confirm('Sei sicuro di voler eliminare questo prospect?')) {
+                    setProspects(prev => prev.filter(p => p.id !== id));
+                }
+            };
+
+            const clearAllProspects = () => {
+                if (confirm('Sei sicuro di voler eliminare TUTTI i prospect? Questa azione non può essere annullata.')) {
+                    setProspects([]);
+                    localStorage.removeItem('fieraProspects');
+                }
+            };
+
+            const getPriorityColor = (priority) => {
+                switch (priority) {
+                    case 'alta': return 'bg-red-100 text-red-800';
+                    case 'media': return 'bg-yellow-100 text-yellow-800';
+                    case 'bassa': return 'bg-green-100 text-green-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            };
+
+            const filteredProspects = prospects.filter(p => 
+                p.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.cognome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.azienda.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.email.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (showForm) {
+                return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4" },
+                    React.createElement('div', { className: "max-w-2xl mx-auto" },
+                        React.createElement('div', { className: "bg-white rounded-xl shadow-lg p-6" },
+                            React.createElement('div', { className: "flex items-center justify-between mb-6" },
+                                React.createElement('h1', { className: "text-2xl font-bold text-gray-900" }, "Nuovo Prospect"),
+                                React.createElement('button', {
+                                    onClick: () => setShowForm(false),
+                                    className: "px-4 py-2 text-gray-600 hover:text-gray-900 font-medium"
+                                }, "Annulla")
+                            ),
+                            React.createElement('div', { className: "space-y-4" },
+                                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
+                                    React.createElement('div', null,
+                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Nome *"),
+                                        React.createElement('input', {
+                                            type: "text",
+                                            name: "nome",
+                                            value: formData.nome,
+                                            onChange: handleInputChange,
+                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        })
+                                    ),
+                                    React.createElement('div', null,
+                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Cognome *"),
+                                        React.createElement('input', {
+                                            type: "text",
+                                            name: "cognome",
+                                            value: formData.cognome,
+                                            onChange: handleInputChange,
+                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        })
+                                    )
+                                ),
+                                React.createElement('div', null,
+                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Azienda *"),
+                                    React.createElement('input', {
+                                        type: "text",
+                                        name: "azienda",
+                                        value: formData.azienda,
+                                        onChange: handleInputChange,
+                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    })
+                                ),
+                                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
+                                    React.createElement('div', null,
+                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Email"),
+                                        React.createElement('input', {
+                                            type: "email",
+                                            name: "email",
+                                            value: formData.email,
+                                            onChange: handleInputChange,
+                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        })
+                                    ),
+                                    React.createElement('div', null,
+                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Telefono"),
+                                        React.createElement('input', {
+                                            type: "tel",
+                                            name: "telefono",
+                                            value: formData.telefono,
+                                            onChange: handleInputChange,
+                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        })
+                                    )
+                                ),
+                                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
+                                    React.createElement('div', null,
+                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Ruolo"),
+                                        React.createElement('input', {
+                                            type: "text",
+                                            name: "ruolo",
+                                            value: formData.ruolo,
+                                            onChange: handleInputChange,
+                                            placeholder: "es. CEO, Marketing Manager...",
+                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        })
+                                    ),
+                                    React.createElement('div', null,
+                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Settore"),
+                                        React.createElement('input', {
+                                            type: "text",
+                                            name: "settore",
+                                            value: formData.settore,
+                                            onChange: handleInputChange,
+                                            placeholder: "es. Tecnologia, Manifatturiero...",
+                                            className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        })
+                                    )
+                                ),
+                                React.createElement('div', null,
+                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Interesse/Prodotto"),
+                                    React.createElement('input', {
+                                        type: "text",
+                                        name: "interesse",
+                                        value: formData.interesse,
+                                        onChange: handleInputChange,
+                                        placeholder: "A cosa è interessato?",
+                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    })
+                                ),
+                                React.createElement('div', null,
+                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Priorità"),
+                                    React.createElement('select', {
+                                        name: "priorita",
+                                        value: formData.priorita,
+                                        onChange: handleInputChange,
+                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    },
+                                        React.createElement('option', { value: "bassa" }, "Bassa"),
+                                        React.createElement('option', { value: "media" }, "Media"),
+                                        React.createElement('option', { value: "alta" }, "Alta")
+                                    )
+                                ),
+                                React.createElement('div', null,
+                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "Note"),
+                                    React.createElement('textarea', {
+                                        name: "note",
+                                        value: formData.note,
+                                        onChange: handleInputChange,
+                                        rows: 3,
+                                        placeholder: "Note aggiuntive...",
+                                        className: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    })
+                                ),
+                                React.createElement('button', {
+                                    onClick: handleSubmit,
+                                    className: "w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 font-medium transition duration-200"
+                                },
+                                    React.createElement(CheckCircle, { className: "inline w-5 h-5 mr-2" }),
+                                    "Salva Prospect"
+                                )
+                            )
+                        )
+                    )
+                );
+            }
+
+            return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" },
+                React.createElement('div', { className: "bg-white shadow-sm border-b border-gray-200" },
+                    React.createElement('div', { className: "max-w-7xl mx-auto px-4 py-4" },
+                        React.createElement('div', { className: "flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0" },
+                            React.createElement('div', { className: "flex items-center space-x-3" },
+                                React.createElement(Users, { className: "h-8 w-8 text-blue-600" }),
+                                React.createElement('div', null,
+                                    React.createElement('h1', { className: "text-2xl font-bold text-gray-900" }, "Prospect Fiera"),
+                                    React.createElement('p', { className: "text-sm text-gray-600" }, `${prospects.length} prospect raccolti`)
+                                )
+                            ),
+                            React.createElement('div', { className: "flex flex-col sm:flex-row gap-3" },
+                                React.createElement('button', {
+                                    onClick: exportToCSV,
+                                    disabled: prospects.length === 0,
+                                    className: "flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition duration-200"
+                                },
+                                    React.createElement(Download, { className: "w-4 h-4 mr-2" }),
+                                    "Esporta CSV"
+                                ),
+                                prospects.length > 0 && React.createElement('button', {
+                                    onClick: clearAllProspects,
+                                    className: "flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition duration-200"
+                                },
+                                    React.createElement(Trash2, { className: "w-4 h-4 mr-2" }),
+                                    "Cancella Tutto"
+                                ),
+                                React.createElement('button', {
+                                    onClick: () => setShowForm(true),
+                                    className: "flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition duration-200"
+                                },
+                                    React.createElement(Plus, { className: "w-4 h-4 mr-2" }),
+                                    "Nuovo Prospect"
+                                )
+                            )
+                        )
+                    )
+                ),
+                React.createElement('div', { className: "max-w-7xl mx-auto px-4 py-6" },
+                    React.createElement('div', { className: "relative mb-6" },
+                        React.createElement(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" }),
+                        React.createElement('input', {
+                            type: "text",
+                            placeholder: "Cerca per nome, cognome, azienda o email...",
+                            value: searchTerm,
+                            onChange: (e) => setSearchTerm(e.target.value),
+                            className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        })
+                    ),
+                    filteredProspects.length === 0 ? 
+                        React.createElement('div', { className: "text-center py-12" },
+                            React.createElement(Users, { className: "mx-auto h-12 w-12 text-gray-400 mb-4" }),
+                            React.createElement('h3', { className: "text-lg font-medium text-gray-900 mb-2" },
+                                prospects.length === 0 ? 'Nessun prospect ancora' : 'Nessun risultato'
+                            ),
+                            React.createElement('p', { className: "text-gray-600 mb-6" },
+                                prospects.length === 0 ? 'Inizia a raccogliere i dati dei visitatori del tuo stand' : 'Prova a cercare con termini diversi'
+                            ),
+                            prospects.length === 0 && React.createElement('button', {
+                                onClick: () => setShowForm(true),
+                                className: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition duration-200"
+                            }, "Aggiungi il primo prospect")
+                        ) :
+                        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+                            filteredProspects.map((prospect) =>
+                                React.createElement('div', { key: prospect.id, className: "bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-200" },
+                                    React.createElement('div', { className: "flex justify-between items-start mb-4" },
+                                        React.createElement('div', null,
+                                            React.createElement('h3', { className: "text-lg font-semibold text-gray-900" },
+                                                `${prospect.nome} ${prospect.cognome}`
+                                            ),
+                                            React.createElement('div', { className: "flex items-center text-gray-600 mt-1" },
+                                                React.createElement(Building, { className: "h-4 w-4 mr-1" }),
+                                                React.createElement('span', { className: "text-sm" }, prospect.azienda)
+                                            )
+                                        ),
+                                        React.createElement('span', { className: `px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(prospect.priorita)}` },
+                                            prospect.priorita.charAt(0).toUpperCase() + prospect.priorita.slice(1)
+                                        )
+                                    ),
+                                    React.createElement('div', { className: "space-y-2" },
+                                        prospect.email && React.createElement('div', { className: "flex items-center text-sm text-gray-600" },
+                                            React.createElement(Mail, { className: "h-4 w-4 mr-2" }),
+                                            React.createElement('span', { className: "truncate" }, prospect.email)
+                                        ),
+                                        prospect.telefono && React.createElement('div', { className: "flex items-center text-sm text-gray-600" },
+                                            React.createElement(Phone, { className: "h-4 w-4 mr-2" }),
+                                            React.createElement('span', null, prospect.telefono)
+                                        ),
+                                        prospect.ruolo && React.createElement('div', { className: "flex items-center text-sm text-gray-600" },
+                                            React.createElement(Tag, { className: "h-4 w-4 mr-2" }),
+                                            React.createElement('span', null, prospect.ruolo)
+                                        ),
+                                        prospect.interesse && React.createElement('div', { className: "flex items-start text-sm text-gray-600" },
+                                            React.createElement(MapPin, { className: "h-4 w-4 mr-2 mt-0.5" }),
+                                            React.createElement('span', { className: "line-clamp-2" }, prospect.interesse)
+                                        ),
+                                        prospect.note && React.createElement('div', { className: "flex items-start text-sm text-gray-600" },
+                                            React.createElement(FileText, { className: "h-4 w-4 mr-2 mt-0.5" }),
+                                            React.createElement('span', { className: "line-clamp-2" }, prospect.note)
+                                        )
+                                    ),
+                                    React.createElement('div', { className: "flex items-center justify-between mt-4 pt-4 border-t border-gray-100" },
+                                        React.createElement('div', { className: "flex items-center text-xs text-gray-500" },
+                                            React.createElement(Calendar, { className: "h-3 w-3 mr-1" }),
+                                            `${prospect.dataInserimento} - ${prospect.oraInserimento}`
+                                        ),
+                                        React.createElement('button', {
+                                            onClick: () => deleteProspect(prospect.id),
+                                            className: "text-red-500 hover:text-red-700 text-xs font-medium flex items-center"
+                                        }, 
+                                            React.createElement(Trash2, { className: "h-3 w-3 mr-1" }),
+                                            "Elimina"
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                )
+            );
+        };
+
+        ReactDOM.render(React.createElement(ProspectApp), document.getElementById('root'));
+    </script>
+</body>
+</html>
